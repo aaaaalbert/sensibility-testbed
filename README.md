@@ -23,6 +23,7 @@ conversions are required. (See this [example](https://github.com/aaaaalbert/sens
 # Build
 
 * Clone the project
+* Check out the `use-android-studio` branch
 * Use `ndk-build` in `sensibility-testbed/app/src/main/jni` to build the 
   native module, `snakei`.
 * Copy the shared objects for Snakei and Python from 
