@@ -5,12 +5,13 @@
     android:versionName="20160324-1404CET-Alpha" >
 
     <uses-sdk
-        android:minSdkVersion="20"
+        android:minSdkVersion="21"
         android:targetSdkVersion="22" />
 
 
     <application
         android:icon="@drawable/ic_launcher"
+        android:name="com.sensibility_testbed.SensibilityApplication"
         android:label="@string/app_name" >
         <!--android:name="com.sensibility_testbed.ScriptApplication"-->
         <activity
@@ -63,9 +64,19 @@
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
+    <!--Includes permissions for network and gps location provider-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
 
 </manifest>

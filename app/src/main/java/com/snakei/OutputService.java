@@ -1,33 +1,52 @@
 package com.snakei;
 // TODO Should we make this a proper Library Module? https://developer.android.com/tools/projects/index.html#LibraryModules
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.sensibility_testbed.SensibilityApplication;
+
 
 /**
- * Output service for Snakei
+ * Created by
+ * albert.rafetseder@univie.ac.at
+ * lukas.puehringer@nyu.edu
+ * on 5/4/16.
  *
- * This class hosts methods that let a Sensibility experiment
- * output information to the device owner.
+ * A pseudo Service class that provides a static method to write a String
+ * to the Android log and also as a Toast to the device's UI
+ *
+ * Note:
+ * This and all but one of the other snakei.*Service.java classes are not real
+ * Android Services:
+ * They are never started as a Servicec in the app
+ * But, PythonInterpreterService is a real Android Service started by the app
+ * which executes this via python->c->jni
+ *
  */
-public class OutputService extends Service {
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // TODO I assume that my methods will be available for calling into directly
-        // TODO Therefor I don't set up anything
-        return START_STICKY;
-    }
+public class OutputService {
+    static final String TAG = "OutputService";
+    public static Toast toast;
 
-    public static void logMessage(String message) {
+    public static void logMessage(final String message) throws Exception {
         // This logs into the debug log...
-        Log.i("######## Foo: ", message);
-    }
+        Log.i(TAG, message);
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        // Don't provide means to bind this service
-        return null;
+        //Also log to UI
+        //XXX useful for e.g. GPS debugging where I have to carry the phone around
+        final Context app_context = SensibilityApplication.getAppContext();
+        // UI activity needs to run on the UI Thread (MainLooper)
+        final Handler handler = new Handler(app_context.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (toast != null)
+                    toast.cancel();
+                toast = Toast.makeText(app_context, message, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
     }
 }

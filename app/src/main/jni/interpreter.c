@@ -1,50 +1,44 @@
+/*
+ * Created by
+ * albert.rafetseder@univie.ac.at
+ * lukas.puehringer@nyu.edu
+ * on 3/30/16
+ *
+ * The native implementation of startNativePythonInterpreter declared in
+ * PythonInterpreterService.java
+ *
+ * Currently the interpreter is used to initialize "sensor" functions as Python
+ * modules - init*(), acquire resources in Java - *_start_*(), run Python
+ * tests scripts that use the new modules, and eventually release the
+ * resources - *_stop_*().
+ *
+ *
+ * Note:
+ * Btw. this is the local JNI scope, all local references that get created
+ * in here, e.g. by running a Python script that uses C-Python Extension, which
+ * create native references to Java objects will not be automatically released
+ * until this function returns
+ * They can (and should be) released explicitly, though
+ *
+ *
+ */
+
 #include "interpreter.h"
 
+void Java_com_snakei_PythonInterpreterService_startNativePythonInterpreter(
+        JNIEnv* env, jobject instance, jstring python_files) {
 
-/* Python-callable wrapper for LOGI */
-static PyObject*
-androidlog_log(PyObject *self, PyObject *python_string)
-{
-  LOGI("%s", PyString_AsString(python_string));
-  Py_RETURN_NONE;  // I.e., `return Py_None;` with reference counting
-}
+  char* files = (char*) (*env)->GetStringUTFChars(env, python_files, NULL);
 
-
-
-/* Describe to Python how the method should be called */
-static PyMethodDef AndroidlogMethods[] = {
-  {"log", androidlog_log, METH_O,
-    "Log an informational string to the Android log."},
-  {"log2", androidlog_log2, METH_O,
-    "Log an informational string through JNI."},
-  {NULL, NULL, 0, NULL} // This is the end-of-array marker
-};
-
-
-
-void Java_com_snakei_PythonInterpreterService_startNativePythonInterpreter(JNIEnv* env, jobject instance, jstring python_home, jstring python_path, jstring python_script, jstring python_arguments) {
-  char* home = (char*) (*env)->GetStringUTFChars(env, python_home, NULL);
-  char* path = (char*) (*env)->GetStringUTFChars(env, python_path, NULL);
-  // Environment variable EXTERNAL_STORAGE is /storage/emulated/legacy
-  char* script = "/storage/emulated/legacy/Android/data/com.sensibility_testbed/files/test2.py"; //(char*) (*env)->GetStringUTFChars(env, python_script, NULL);
-  char* args = (char*) (*env)->GetStringUTFChars(env, python_arguments, NULL);
-
-  FILE* script_pointer;
-
-  LOGI("home is %s but I won't set it! Ha!", home);
-  //Py_SetPythonHome(home);
-
-  LOGI("script is %s", script);
-  LOGI("Oh and btw, args are %s", args);
-
-  //Py_SetProgramName("/sdcard/mypython/python");
   LOGI("Before Py_Initialize...");
   Py_Initialize();
 
-  LOGI("path is %s", path);
-  PySys_SetPath(path);
+//    PySys_SetPath(path);
+//    Py_SetPythonHome(home);
+//    Py_SetProgramName("/sdcard/mypython/python");
 
-  // Print stats about the environment
+
+    // Print stats about the environment
   LOGI("ProgramName %s", (char*) Py_GetProgramName());
   LOGI("Prefix %s", Py_GetPrefix());
   LOGI("ExecPrefix %s", Py_GetExecPrefix());
@@ -53,26 +47,70 @@ void Java_com_snakei_PythonInterpreterService_startNativePythonInterpreter(JNIEn
   LOGI("Platform %s", Py_GetPlatform());
   LOGI("PythonHome %s", Py_GetPythonHome());
 
+  initandroidlog();
 
+  char *filename;
+  char *full_filename;
 
-  LOGI("Initializing androidlog module");
-  Py_InitModule("androidlog", AndroidlogMethods);
-  LOGI("androidlog initted");
-
-  LOGI("PyRun string returns %i", PyRun_SimpleString("import androidlog\nl = androidlog.log2\nl('Ooh yeah!')\ntry:\n  import os\nexcept Exception, e:\n  l(repr(e)\nl('still k')\nl(os.getlogin())\n")); //l(str(os.getresuid()))\nl(os.getgroups())\nl(str(os.getresgid()))\n") );
-  //try:\n  l('How?')\n  f = open('/sdcard/Android/data/com.sensibility_testbed/files/blip', 'w')\nexcept Exception, e:\n  l(repr(e))\nelse:\n  f.write('It worketh!!!\\n')\nl('Done.')\n") );
-
-  LOGI("Now do the file!!!");
-  script_pointer = fopen(script, "r");
-  if (script_pointer == NULL) {
-    LOGI("NULL file pointer for '%s' because errno %i '%s'", script, errno, strerror(errno));
+  LOGI("Start Sensing IN C!!!!");
+  initsensor();
+  int i;
+  for (i = 1;  i <= 17; i++) {
+     sensor_start_sensing(i);
   }
-  LOGI("PyRun returns %i", PyRun_SimpleFile(script_pointer, script));
+
+  // Och, memory...
+  filename = "test_sensors.py";
+  full_filename = (char *) malloc(1 + strlen(files) + strlen(filename));
+  strcpy(full_filename, files);
+  strcat(full_filename, filename);
+
+  LOGI("PyRun returns %i", Verbose_PyRun_SimpleFile(full_filename));
+  LOGI("Stop Sensing IN C!!!!");
+  int j;
+  for (j = 1;  j <= 17; j++) {
+    sensor_stop_sensing(j);
+   }
+
+  LOGI("Start Locating IN C!!!!");
+  initlocation();
+  location_start_location();
+  filename = "test_location.py";
+  full_filename = (char *) malloc(1 + strlen(files) + strlen(filename));
+  strcpy(full_filename, files);
+  strcat(full_filename, filename);
+  LOGI("PyRun File: %s", full_filename);
+  LOGI("PyRun returns %i for %s", Verbose_PyRun_SimpleFile(full_filename),
+       filename);
+  LOGI("Stop Locating IN C!!!!");
+  location_stop_location();
+
+  LOGI("Start Media-ing IN C!!!!");
+  initmedia();
+  media_start_media();
+  filename = "test_tts.py";
+  full_filename = (char *) malloc(1 + strlen(files) + strlen(filename));
+  strcpy(full_filename, files);
+  strcat(full_filename, filename);
+  LOGI("PyRun File: %s", full_filename);
+  LOGI("PyRun returns %i for %s", Verbose_PyRun_SimpleFile(full_filename),
+       filename);
+  LOGI("Stop Media-ing IN C!!!!");
+  media_stop_media();
+
+  LOGI("Init and start MiscInfo-ing IN C!!!!");
+  initmiscinfo();
+  filename = "test_miscinfo.py";
+  full_filename = (char *) malloc(1 + strlen(files) + strlen(filename));
+  strcpy(full_filename, files);
+  strcat(full_filename, filename);
+  LOGI("PyRun File: %s", full_filename);
+  LOGI("PyRun returns %i for %s", Verbose_PyRun_SimpleFile(full_filename),
+       filename);
 
   LOGI("Before Py_Finalize...");
   Py_Finalize();
+
   LOGI("Done. Bye!");
-
-
 };
 

@@ -7,7 +7,7 @@ model {
 
         defaultConfig.with {
             applicationId = "com.sensibility_testbed"
-            minSdkVersion.apiLevel = 19
+            minSdkVersion.apiLevel = 21
             targetSdkVersion.apiLevel = 22
             versionCode = 1
             versionName = "1.0"
@@ -55,6 +55,7 @@ model {
 }
 dependencies {
     compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.google.android.gms:play-services-location:9.0.0'
     compile 'com.google.guava:guava:18.0'
     compile files('libs/libGoogleAnalytics.jar')
     compile files('libs/locale_platform.jar')
