@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.google.firebase/firebase-common/9.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="42df48c7305b08b14fa0e84561091b0c24d70d26">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.google.firebase-firebase-common-9.0.0_61529e8eab2808cf594d34542928e0041748f58b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.0/jars/libs/internal_impl-23.0.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="8bd336eeae661e8311330284897ee07f8ebaa297">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/internal_impl-23.0.0_2a4c6463afa5243af0c7a1b8b8b495d2e6700476.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/23.0.0/support-annotations-23.0.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="990e7f98a7bad86a40b1f0bcfeb039023afd0839">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/support-annotations-23.0.0_26a1359f1e0d45fd83021aac590dda9be43b2ea5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-tasks/9.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="1941832901fc4e7a93300b53762e9f65d7650b99">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-tasks-9.0.0_aa88c2258c65cc6875f9cd4381058f175a04235f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.android.support/support-v4/23.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="8413c27b45b7fe61dca4a98159f65e2cee215f5a">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-23.0.0_b894be429f19b5a756be61d1bfd3291ed797401e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/9.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="a819aae4f0c711e50b4fd633922a3c1a176cb51e">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-maps-9.0.0_8003c1e087ec56ca9527b878b3c61ead745c773b.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/libs/locale_platform.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="0829dfa494c746b8ab018cdbbf4b6980b6707819">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/locale_platform_05c38afe16c5d2f1b7a7903aab3e032d4d08729f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/9.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="59cca9b91688dc2467754d36793b3d23bebd21a9">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-location-9.0.0_b6d66fe007d419b2ad821a4365a771739cdd0c3a.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/9.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="cc178928721f3222b3b06bdfbd9497378ccb9792">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-basement-9.0.0_ce11f96a39e9a319daff027fbf9d01b0c919bee7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/libs/script.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="421939b5041013b3b5bda72d60005d11eababa38">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/script_9f5ebf939ad3fff9ad9a1c1279d18ef59bead393.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/libs/libGoogleAnalytics.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="b635fdd351d7031266c1e855903cd737763df97c">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/libGoogleAnalytics_89be49d970f0b77f98c3d8a919227576f2b7a10d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.0.0/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="24.0.0"
+        sha1="6f65c144283b31b4b9a70e6e7aa4c4a1c897d4b8">
+        <dex dex="/Users/mdkabir/Documents/sensibility/sensibility-testbed/app/build/intermediates/pre-dexed/debug/com.google.android.gms-play-services-base-9.0.0_978babe4e07c31b4483d4ef8c094984bed6c7ebc.jar" />
+    </item>
+
+</items>

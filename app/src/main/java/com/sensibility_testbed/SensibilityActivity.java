@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -99,6 +100,7 @@ public class SensibilityActivity extends Activity {
         Log.d(TAG, String.format("Unpacking python to %s", FILES_ROOT));
         try {
             Utils.unzip(getResources().openRawResource(R.raw.python_lib), FILES_ROOT, true);
+            
         } catch (Exception e) {
             Log.d(TAG, String.format("Couldn't unpack python archive: %s", e.getMessage()));
         }
@@ -373,6 +375,7 @@ public class SensibilityActivity extends Activity {
                 .getIdentifier("seattle_android", "raw", getPackageName());
 
     }
+
 
     /*
      * Shows the User Interface
