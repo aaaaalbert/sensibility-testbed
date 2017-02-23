@@ -13,6 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 import com.snakei.PythonInterpreterService;
 
@@ -100,7 +103,6 @@ public class SensibilityActivity extends Activity {
         Log.d(TAG, String.format("Unpacking python to %s", FILES_ROOT));
         try {
             Utils.unzip(getResources().openRawResource(R.raw.python_lib), FILES_ROOT, true);
-            
         } catch (Exception e) {
             Log.d(TAG, String.format("Couldn't unpack python archive: %s", e.getMessage()));
         }
@@ -376,6 +378,25 @@ public class SensibilityActivity extends Activity {
 
     }
 
+    /* Function to send notification */
+    private void notifyMessage(String title, String message){
+        /* Setup Notification Builder */
+        NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(this);
+        notifBuilder.setSmallIcon(R.drawable.ic_launcher);
+        notifBuilder.setContentTitle(title);
+        notifBuilder.setContentText(message);
+        /* Setup Notification Manager and notify */
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, notifBuilder.build());
+    }
+
+    /* Function to setup toast message */
+    private void toastMessage(String message){
+        /* utilize android toast message */
+        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT);
+    }
+
+    
 
     /*
      * Shows the User Interface
