@@ -65,9 +65,11 @@ public class SensibilityActivity extends Activity {
 
     public static final String TAG = "SensibilityActivity";
 
+
     // TODO This should point to an "altruistic" installer, not @lukpueh's!
     private String DEFAULT_DOWNLOAD_URL =
-            "https://alpha-ch.poly.edu/cib/9512d6c89e75789da08063cbe8a0b14bf298e043/installers/android";
+            "https://alpha-ch.poly.edu/cib/278d4df96687a8e1c57283fc396d5c77b6787398/installers/android";
+
 
     private String ALPHA_CIB_CERTIFICATE;
     private String FILES_ROOT;
