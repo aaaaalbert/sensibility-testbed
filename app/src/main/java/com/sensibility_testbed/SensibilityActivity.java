@@ -378,7 +378,7 @@ public class SensibilityActivity extends Activity {
 
     }
 
-    /* Function to send notification */
+    /* Method to send notification */
     private void notifyMessage(String title, String message){
         /* Setup Notification Builder */
         NotificationCompat.Builder notifBuilder = new NotificationCompat.Builder(this);
@@ -390,13 +390,13 @@ public class SensibilityActivity extends Activity {
         mNotificationManager.notify(0, notifBuilder.build());
     }
 
-    /* Function to setup toast message */
+    /* Method to setup toast message */
     private void toastMessage(String message){
         /* utilize android toast message */
         Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT);
     }
 
-    
+
 
     /*
      * Shows the User Interface
