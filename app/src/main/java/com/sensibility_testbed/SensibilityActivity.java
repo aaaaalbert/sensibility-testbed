@@ -69,7 +69,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class SensibilityActivity extends Activity {
 
     public static final String TAG = "SensibilityActivity";
-    public static final String DOWNLOAD_PREF_STR = "RequiredComponents";
+    public static final String DOWNLOAD_PREF_STR = "RequiredComponentsInstaller";
     public static final String PYTHON_KEY = "downloadedPython";
     public static final String SEATTLE_KEY = "downloadedSeattle";
 
@@ -418,16 +418,16 @@ public class SensibilityActivity extends Activity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                progress.setMessage("Installing Python..."); /* update dialog */
-                                installPython();                             /* install python */
-                                Thread.sleep(1000);                          /* set a 1 second sleep */
-                            }
-                            catch(InterruptedException e){
-                                e.printStackTrace();
-                            }
+                            progress.setMessage("Installing Python..."); /* update dialog */
+                            installPython();                             /* install python */
                         }
                     });
+                    try {
+                        Thread.sleep(1000);                          /* set a 1 second sleep */
+                    }
+                    catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
 
                     editor.putBoolean(PYTHON_KEY,true); /* set python installed to true */
                     editor.commit();                    /* commit changes */
@@ -435,23 +435,23 @@ public class SensibilityActivity extends Activity {
 
                 /* check if seattle was installed */
                 Log.d(TAG,"Checking if Seattle installed");
-                if((! DOWNLOAD_PREF.contains(SEATTLE_KEY)) || !DOWNLOAD_PREF.getBoolean(SEATTLE_KEY,true)) {
+                if((! downloadPref.contains(SEATTLE_KEY)) || !downloadPref.getBoolean(SEATTLE_KEY,true)) {
                     /* if seattle not installed set seattle installed to false */
                     editor.putBoolean(SEATTLE_KEY, false);
                     /* run UI thread for installing seattle and updating dialog */
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                progress.setMessage("Installing Seattle...");   /* update dialog */
-                                rawResourceInstallSeattle();                    /* install seattle (zip) */
-                                Thread.sleep(1000);                             /* set 1 second sleep */
-                            }
-                            catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            progress.setMessage("Installing Seattle...");   /* update dialog */
+                            rawResourceInstallSeattle();                    /* install seattle (zip) */
                         }
                     });
+                    try {
+                        Thread.sleep(1000);                             /* set 1 second sleep */
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     editor.putBoolean(SEATTLE_KEY, true);   /* seattle installed to true */
                     editor.commit();                        /* commit changes */
                 }
