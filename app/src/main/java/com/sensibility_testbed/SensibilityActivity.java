@@ -2,21 +2,19 @@ package com.sensibility_testbed;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.content.Context;
+import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
 
 
 import com.snakei.PythonInterpreterService;
@@ -24,6 +22,7 @@ import com.snakei.PythonInterpreterService;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -70,6 +69,9 @@ import javax.net.ssl.HttpsURLConnection;
 public class SensibilityActivity extends Activity {
 
     public static final String TAG = "SensibilityActivity";
+    public static final String DOWNLOAD_PREF_STR = "RequiredComponents";
+    public static final String PYTHON_KEY = "downloadedPython";
+    public static final String SEATTLE_KEY = "downloadedSeattle";
 
 
     // TODO This should point to an "altruistic" installer, not @lukpueh's!
@@ -84,6 +86,8 @@ public class SensibilityActivity extends Activity {
     private String PYTHON;
     private String PYTHON_LIB;
     private String PYTHON_SCRIPTS;
+
+    private SharedPreferences DOWNLOAD_PREF;
 
     // A code to filter permission requests issued by us in the permission request callback
     public final int SENSIBILITY_RUNTIME_PERMISSIONS = 1;
@@ -380,7 +384,87 @@ public class SensibilityActivity extends Activity {
 
     }
 
-    
+    /*
+     * method to check if user needs to install any required packages and installs it
+     *
+    */
+    private void installRequired(){
+        Log.d(TAG,"Checking install requirements");
+
+        /* setup progress spinner */
+        final ProgressDialog progress = new ProgressDialog(this); /* set the context to the app's context */
+        progress.setMessage("Checking for requirements...");      /* set a default message */
+        progress.setIndeterminate(true);                          /* no total percent just spinning */
+        progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.setCancelable(false);                            /* can't close the dialog */
+        progress.show();                                          /* show the progress dialog */
+
+
+        /* thread to  install components and update the progress dialog */
+        Thread requireThread = new Thread() {
+            @Override
+            public void run() {
+
+                /* setup preference, preference editor */
+                SharedPreferences downloadPref = getSharedPreferences(DOWNLOAD_PREF_STR,MODE_PRIVATE);
+                SharedPreferences.Editor editor = downloadPref.edit();
+
+                /* check if python was installed */
+                Log.d(TAG,"Checking if Python installed");
+                if((! downloadPref.contains(PYTHON_KEY)) || !downloadPref.getBoolean(PYTHON_KEY,true)){
+                    /* if not installed set python installed to false */
+                    editor.putBoolean(PYTHON_KEY,false);
+                    /* run UI thread for installing component and updating dialog */
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                progress.setMessage("Installing Python..."); /* update dialog */
+                                installPython();                             /* install python */
+                                Thread.sleep(1000);                          /* set a 1 second sleep */
+                            }
+                            catch(InterruptedException e){
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                    editor.putBoolean(PYTHON_KEY,true); /* set python installed to true */
+                    editor.commit();                    /* commit changes */
+                }
+
+                /* check if seattle was installed */
+                Log.d(TAG,"Checking if Seattle installed");
+                if((! DOWNLOAD_PREF.contains(SEATTLE_KEY)) || !DOWNLOAD_PREF.getBoolean(SEATTLE_KEY,true)) {
+                    /* if seattle not installed set seattle installed to false */
+                    editor.putBoolean(SEATTLE_KEY, false);
+                    /* run UI thread for installing seattle and updating dialog */
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                progress.setMessage("Installing Seattle...");   /* update dialog */
+                                rawResourceInstallSeattle();                    /* install seattle (zip) */
+                                Thread.sleep(1000);                             /* set 1 second sleep */
+                            }
+                            catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    editor.putBoolean(SEATTLE_KEY, true);   /* seattle installed to true */
+                    editor.commit();                        /* commit changes */
+                }
+
+                progress.dismiss(); /* close progress dialog at the end */
+            }
+        };
+        requireThread.start(); /* start the thread */
+
+
+    }
+
+
 
     /*
      * Shows the User Interface
@@ -394,6 +478,7 @@ public class SensibilityActivity extends Activity {
         super.onStart();
         Log.d(TAG, "Calling checkRequestPermissions");
         checkRequestPermissions();
+        installRequired();
         Log.d(TAG, "Calling initializeSimpleLayout");
         initializeSimpleLayout();
     }
