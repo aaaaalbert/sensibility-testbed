@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.os.Process;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -169,7 +170,20 @@ public class PythonInterpreterService extends Service {
                 // If the Service process was killed by a natively forked process,
                 // it will never get back here, but there is no need to call stopSelf
                 // anyway.
-                stopSelf();
+                //stopSelf();
+
+
+                //FIXME: stopSelf appears to be just a friendly request but does not necessarily
+                //FIXME: stop the service process, which we want in order to re-use it.
+                //FIXME: Moreover, even if the Service is stopped, Android might keep the empty
+                //FIXME: process running for performance reasons.
+
+                //QUICKFIX: Harshly kill the process when it is done with its work
+                //https://github.com/aaaaalbert/sensibility-testbed/issues/21
+                //http://www.revealedtricks4u.com/2015/06/how-to-force-kill-service-programmatically-in-android.html
+
+                Process.killProcess(Process.myPid());
+
             }
         }).start();
 
