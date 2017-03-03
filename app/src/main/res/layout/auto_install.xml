@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:theme="@android:style/Theme.Holo">
+
+    <TextView
+        android:text="Welcome to the Sensibility Testbed App"
+        android:textSize="16dp"
+        android:textColor="@android:color/black"
+        android:layout_width="290dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="50dp"
+        android:id="@+id/textView2" />
+
+    <TextView
+        android:layout_marginTop="30dp"
+        android:layout_width="290dp"
+        android:layout_height="30dp"
+        android:id="@+id/pythonSetup"
+        android:text="\u2715 Python Installed"
+        android:textColor="@android:color/holo_red_dark"/>
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:layout_width="290dp"
+        android:layout_height="30dp"
+        android:id="@+id/seattleSetup"
+        android:text="\u2715 Seattle Installed"
+        android:textColor="@android:color/holo_red_dark"/>
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:layout_width="290dp"
+        android:layout_height="30dp"
+        android:id="@+id/nodeRunning"
+        android:text="\u2715 Nodemanager running"
+        android:textColor="@android:color/holo_red_dark"/>
+
+
+</LinearLayout>

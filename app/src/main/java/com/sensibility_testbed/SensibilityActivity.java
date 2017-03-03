@@ -9,16 +9,25 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
+import android.widget.Switch;
+import android.widget.TabHost;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
+import android.graphics.Color;
 
 
 import com.snakei.PythonInterpreterService;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -66,28 +75,26 @@ import javax.net.ssl.HttpsURLConnection;
  * I think we should Fragments for each of above
  *
  */
-public class SensibilityActivity extends Activity {
+public class SensibilityActivity extends FragmentActivity {
 
     public static final String TAG = "SensibilityActivity";
-    public static final String DOWNLOAD_PREF_STR = "RequiredComponentsInstaller";
-    public static final String PYTHON_KEY = "downloadedPython";
-    public static final String SEATTLE_KEY = "downloadedSeattle";
 
 
     // TODO This should point to an "altruistic" installer, not @lukpueh's!
-    private String DEFAULT_DOWNLOAD_URL =
-            "https://alpha-ch.poly.edu/cib/278d4df96687a8e1c57283fc396d5c77b6787398/installers/android";
+     private String DEFAULT_DOWNLOAD_URL =
+            "https://alpha-ch.poly.edu/cib/7e861c52f72c5e16e49b93cf60a84b4273a859d3/installers/android/";
 
 
     private String ALPHA_CIB_CERTIFICATE;
     private String FILES_ROOT;
     private String SEATTLE_ZIP;
+    private String VESSEL_PATH;  /* use path to check if seattle is installed */
     private int SEATTLE_RAW_RESOURCE_ID;
     private String PYTHON;
     private String PYTHON_LIB;
     private String PYTHON_SCRIPTS;
+    private boolean DEV; /* check if been to dev mode before */
 
-    private SharedPreferences DOWNLOAD_PREF;
 
     // A code to filter permission requests issued by us in the permission request callback
     public final int SENSIBILITY_RUNTIME_PERMISSIONS = 1;
@@ -104,6 +111,8 @@ public class SensibilityActivity extends Activity {
      *   Add logging
      *   Error handling
      */
+
+
     private void installPython() {
         Log.d(TAG, "Entering installPython");
         Log.d(TAG, String.format("Unpacking python to %s", FILES_ROOT));
@@ -121,6 +130,7 @@ public class SensibilityActivity extends Activity {
         StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
         long availableDiskSpace = statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong();
 
+
         String[] python_args = {
                 "seattleinstaller.py", "--percent", "50",
                 "--disable-startup-script",
@@ -130,8 +140,6 @@ public class SensibilityActivity extends Activity {
         PythonInterpreterService.startService(python_args, getBaseContext());
     }
 
-
-
     private URL get_download_url() throws MalformedURLException {
         /*
          * Return the download URL for the Sensibility/Repy installer.
@@ -139,23 +147,29 @@ public class SensibilityActivity extends Activity {
          * textbox, or (if that is empty) taken from the hardcoded default.
          */
 
-        URL download_url;
+            // Get the user's desired download URL, if any
+            EditText editText = (EditText) findViewById(R.id.url_edittext);
+            String user_download_url = editText.getText().toString();
 
-        // Get the user's desired download URL, if any
-        EditText editText = (EditText) findViewById(R.id.url_edittext);
-        String user_download_url = editText.getText().toString();
-
-       if (user_download_url.isEmpty()) {
-           Log.i(TAG, "Empty user download URL; using DEFAULT_DOWNLOAD_URL '" +
-                   DEFAULT_DOWNLOAD_URL + "' instead.");
-           return new URL(DEFAULT_DOWNLOAD_URL);
-       } else {
-           return new URL(user_download_url);
-       }
+            if (user_download_url.isEmpty()) {
+                Log.i(TAG, "No URL passed downloading from zip");
+                Toast.makeText(getApplicationContext(),"Downloading from zip...",Toast.LENGTH_SHORT);
+                return null;
+            } else {
+                Log.i(TAG, "Downloading from LINK: "+user_download_url);
+                Toast.makeText(getApplicationContext(),"Downloading from: "+user_download_url,Toast.LENGTH_SHORT);
+                return new URL(user_download_url);
+            }
     }
 
     private void rawResourceInstallSeattle() {
         Log.d(TAG, "Entering rawResourceInstallSeattle");
+
+        if(SEATTLE_RAW_RESOURCE_ID == 0){
+            Log.d(TAG,"Could not download from zip");
+            Toast.makeText(getApplicationContext(),"Could not download from zip",Toast.LENGTH_SHORT);
+            return;
+        }
 
         Log.d(TAG, String.format("Unpacking seattle from raw resources to %s", FILES_ROOT));
         try {
@@ -169,14 +183,18 @@ public class SensibilityActivity extends Activity {
         installSeattle();
     }
 
-    private void downloadAndInstallSeattle() {
+    private void downloadAndInstallSeattle(final URL download_url) {
         Log.d(TAG, "Entering downloadAndInstallSeattle");
 
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
-                    URL download_url = get_download_url();
+
+                    if(download_url == null){
+                        rawResourceInstallSeattle();
+                        return;
+                    }
 
                     Log.d(TAG, String.format("Downloading installer from %s to %s", download_url.toString(), SEATTLE_ZIP));
                     // Download seattle installer package and unpack to internal storage
@@ -191,6 +209,7 @@ public class SensibilityActivity extends Activity {
                         Log.d(TAG, String.format("Connection failed, Code: %d, Message: %s",
                                 connection.getResponseCode(), connection.getResponseMessage()));
                         Log.d(TAG, "Aborting installation");
+                        Toast.makeText(getApplicationContext(),"Could not download from URL!",Toast.LENGTH_SHORT);
                         return;
                     }
 
@@ -238,65 +257,50 @@ public class SensibilityActivity extends Activity {
         Log.d(TAG, "Killing not implemented");
     }
 
-    private void initializeSimpleLayout() {
-        Log.d(TAG, "Entering initializeSimpleLayout");
 
-        Log.d(TAG, "Setting content view to dev_layout");
-        setContentView(R.layout.dev_layout);
+    private void initializeButtons() {
+        Log.d(TAG, "Entering initializing buttons");
 
+        if(!DEV){ /* check if been to dev mode before (if not then setup the buttons */
+            final Button btn_install_seattle = (Button) findViewById(R.id.install_seattle);
+            final Button btn_start = (Button) findViewById(R.id.start);
+            final Button btn_kill = (Button) findViewById(R.id.kill);
 
-        //Initialize buttons
-        Log.d(TAG, "Initializing buttons");
-        final Button btn_install_python = (Button) findViewById(R.id.install_python);
-        final Button btn_install_seattle_ref = (Button) findViewById(R.id.install_seattle_referrer);
-        final Button btn_install_seattle_zip = (Button) findViewById(R.id.install_seattle_zip);
-        final Button btn_start = (Button) findViewById(R.id.start);
-        final Button btn_kill = (Button) findViewById(R.id.kill);
+            // Define listeners for buttons
+            Log.d(TAG, "Defining button listeners");
 
-        // Define listeners for buttons
-        Log.d(TAG, "Defining button listeners");
+            btn_install_seattle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Clicked 'Install Seattle (download)' button");
+                    try {
+                        URL downloadFrom = get_download_url();
+                        downloadAndInstallSeattle(downloadFrom);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
-        btn_install_python.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Clicked 'Install Python' button");
-                installPython();
-            }
-        });
-        btn_install_seattle_ref.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Clicked 'Install Seattle (download)' button");
-                downloadAndInstallSeattle();
-            }
-        });
-        btn_install_seattle_zip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Clicked 'Install Seattle (from zip)' button");
-                rawResourceInstallSeattle();
-            }
-        });
-        // Disable the button if the resource does not exist
-        if (SEATTLE_RAW_RESOURCE_ID == 0) {
-            btn_install_seattle_zip.setEnabled(false);
+            btn_start.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Clicked 'Start' button");
+                    startSeattle();
+                }
+            });
+            btn_kill.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Clicked 'Stop' button");
+                    killSeattle();
+                }
+            });
+
         }
 
-        btn_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Clicked 'Start' button");
-                startSeattle();
-            }
-        });
-        btn_kill.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Clicked 'Stop' button");
-                killSeattle();
-            }
-        });
     }
+
 
     /*
      * Check every required permission and request in case we don't have it yet
@@ -377,6 +381,7 @@ public class SensibilityActivity extends Activity {
         PYTHON = FILES_ROOT + "python/";
         PYTHON_LIB = FILES_ROOT + "python/lib/python2.7/";
         PYTHON_SCRIPTS = FILES_ROOT + "scripts/";
+        VESSEL_PATH = FILES_ROOT + "seattle/seattle_repy/v1/";
 
         // If the raw resource does not exist the id is 0
         SEATTLE_RAW_RESOURCE_ID = getResources()
@@ -384,12 +389,18 @@ public class SensibilityActivity extends Activity {
 
     }
 
+
+
     /*
      * method to check if user needs to install any required packages and installs it
      *
     */
     private void installRequired(){
         Log.d(TAG,"Checking install requirements");
+
+        final TextView pySet = (TextView) findViewById(R.id.pythonSetup);
+        final TextView seattleSet = (TextView) findViewById(R.id.seattleSetup);
+        final TextView nodeMan = (TextView) findViewById(R.id.nodeRunning);
 
         /* setup progress spinner */
         final ProgressDialog progress = new ProgressDialog(this); /* set the context to the app's context */
@@ -405,20 +416,16 @@ public class SensibilityActivity extends Activity {
             @Override
             public void run() {
 
-                /* setup preference, preference editor */
-                SharedPreferences downloadPref = getSharedPreferences(DOWNLOAD_PREF_STR,MODE_PRIVATE);
-                SharedPreferences.Editor editor = downloadPref.edit();
 
                 /* check if python was installed */
                 Log.d(TAG,"Checking if Python installed");
-                if((! downloadPref.contains(PYTHON_KEY)) || !downloadPref.getBoolean(PYTHON_KEY,true)){
-                    /* if not installed set python installed to false */
-                    editor.putBoolean(PYTHON_KEY,false);
+                File pyZip = new File(PYTHON);
+                if(! pyZip.isDirectory() || !pyZip.exists()){
                     /* run UI thread for installing component and updating dialog */
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            progress.setMessage("Installing Python..."); /* update dialog */
+                            progress.setMessage("Setting up python..."); /* update dialog */
                             installPython();                             /* install python */
                         }
                     });
@@ -428,22 +435,32 @@ public class SensibilityActivity extends Activity {
                     catch(InterruptedException e){
                         e.printStackTrace();
                     }
-
-                    editor.putBoolean(PYTHON_KEY,true); /* set python installed to true */
-                    editor.commit();                    /* commit changes */
                 }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pySet.setText("\u2713 Python Installed");
+                        pySet.setTextColor(Color.GREEN);
+                    }
+                });
+
 
                 /* check if seattle was installed */
                 Log.d(TAG,"Checking if Seattle installed");
-                if((! downloadPref.contains(SEATTLE_KEY)) || !downloadPref.getBoolean(SEATTLE_KEY,true)) {
-                    /* if seattle not installed set seattle installed to false */
-                    editor.putBoolean(SEATTLE_KEY, false);
+                File seattleDir = new File(VESSEL_PATH);
+                if(! seattleDir.isDirectory() || !seattleDir.exists()) {
                     /* run UI thread for installing seattle and updating dialog */
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            progress.setMessage("Installing Seattle...");   /* update dialog */
-                            rawResourceInstallSeattle();                    /* install seattle (zip) */
+                            progress.setMessage("Setting up seattle..");   /* update dialog */
+                            try {
+                                URL def = new URL(DEFAULT_DOWNLOAD_URL);
+                                downloadAndInstallSeattle(def);                    /* install seattle from default link */
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            }
+
                         }
                     });
                     try {
@@ -452,15 +469,86 @@ public class SensibilityActivity extends Activity {
                     catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    editor.putBoolean(SEATTLE_KEY, true);   /* seattle installed to true */
-                    editor.commit();                        /* commit changes */
                 }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        seattleSet.setText("\u2713 Seattle Installed");
+                        seattleSet.setTextColor(Color.GREEN);
+                    }
+                });
 
+                /* run UI thread for installing seattle and updating dialog */
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progress.setMessage("Starting Seattle...");   /* update dialog */
+                        startSeattle();                    /* start seattle after installing */
+                    }
+                });
+                try {
+                    Thread.sleep(1000);                             /* set 1 second sleep */
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        nodeMan.setText("\u2713 Nodemanager running");
+                        nodeMan.setTextColor(Color.GREEN);
+                    }
+                });
                 progress.dismiss(); /* close progress dialog at the end */
             }
         };
         requireThread.start(); /* start the thread */
 
+
+    }
+
+    private void setupTabLayout(){
+        Log.d(TAG,"setting up tab layout xml");
+        setContentView(R.layout.tabs); /* set the xml file */
+
+        Log.d(TAG,"setting up tab host");
+        final TabHost tabhost = (TabHost) findViewById(android.R.id.tabhost); /* setup tab host */
+        tabhost.setup();
+
+        Log.d(TAG,"adding tabs to layout");
+        TabHost.TabSpec ts = tabhost.newTabSpec("tag1");
+        ts.setContent(R.id.home); /* set the home tab */
+        ts.setIndicator("Home");
+        tabhost.addTab(ts);
+        ts = tabhost.newTabSpec("tag2");
+        ts.setContent(R.id.manual);
+        ts.setIndicator("Manual");
+        tabhost.addTab(ts);
+        installRequired();
+
+        Log.d(TAG,"add tab listeners");
+        tabhost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+
+            @Override
+            public void onTabChanged(String tabId) {
+
+                int i = tabhost.getCurrentTab();
+                Log.d("Clicked tab number: ", ": " + i);
+
+                if (i == 0) {
+                    installRequired();
+                    Log.i("Inside onClick tab 0", "Home Tab");
+
+                }
+                else if (i ==1) {
+                    initializeButtons();
+                    DEV = true;
+                    Log.i("Inside onClick tab 1", "Manual tab");
+
+                }
+
+            }
+        });
 
     }
 
@@ -478,9 +566,7 @@ public class SensibilityActivity extends Activity {
         super.onStart();
         Log.d(TAG, "Calling checkRequestPermissions");
         checkRequestPermissions();
-        installRequired();
-        Log.d(TAG, "Calling initializeSimpleLayout");
-        initializeSimpleLayout();
+        Log.d(TAG, "Calling setupTabLayout");
     }
 
     /*
@@ -497,6 +583,8 @@ public class SensibilityActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "Calling initializePaths");
         initializePaths();
+        DEV = false; /* set dev mode to false to start */
+        setupTabLayout();
     }
 
     @Override
