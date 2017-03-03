@@ -5,7 +5,7 @@ This is the source repo for SensibilityTestbed (Android app).
 See https://sensibilitytestbed.com/ for details
 
 -----
-We are currently moving away from SL4A towards an embedded Python
+We have moved away from SL4A towards an embedded Python
 interpreter with native-looking sensor interfaces (i.e. Python
 functions that you can call from Python code in order to get
 sensor values).
@@ -165,7 +165,7 @@ To avoid redundant calls into the JVM, classes and methods that get repeatedly c
  - [JNI best practices](http://www.ibm.com/developerworks/java/library/j-jni/index.html)
 
 ## API
-Browse over to [SensibilityRepyAPI](https://github.com/SensibilityTestbed/instructions/blob/master/SensibilityRepyAPI.md) for an exhaustive list of all the functions available to the sensor, media, location, output, and info functions available to the Sensibility Repy V2 sandbox.
+Browse over to the [Sensibility Sensor API document](https://github.com/SensibilityTestbed/instructions/blob/master/SensorAPI.md) for an exhaustive list of all the functions available to the sensor, media, location, output, and info functions available to the Sensibility Repy V2 sandbox.
 
 ## Caveats, pitfalls and notes
 *TODO: Most of them are already mentioned in the source code comments but they should also be mentioned here.*
