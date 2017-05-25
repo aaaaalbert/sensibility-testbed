@@ -72,7 +72,7 @@ public class ConfigFragment extends Fragment {
                 JSONObject networkObject = networkArray.getJSONObject(i);
 
                 // get the sensor name and power
-                String name = networkObject.get("type_name").toString();
+                String name = networkObject.get("show_name").toString();
                 String powerString = "50";
                 Double powerDouble = Double.parseDouble(powerString);
                 String type = "network";
@@ -172,7 +172,7 @@ public class ConfigFragment extends Fragment {
                 JSONObject sensorObject = sensorArray.getJSONObject(i);
 
                 // get the sensor name and power
-                String name = sensorObject.get("name").toString();
+                String name = sensorObject.get("show_name").toString();
                 String powerString = sensorObject.get("power").toString();
                 Double powerDouble = Double.parseDouble(powerString);
                 String type = sensorObject.get("string_type").toString();
