@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *  Created by lukas.puehringer@nyu.edu
@@ -201,9 +203,12 @@ public class SensorService implements SensorEventListener  {
         List<Sensor> sensor_list = sensor_manager.getSensorList(Sensor.TYPE_ALL);
         if (sensor_list.size() > 0) {
             JSONArray sensors_properties_array_json = new JSONArray();
+            int count = 0;
+            int total = 0;
             for (Sensor sensor : sensor_list) {
                 JSONObject sensor_json = new JSONObject();
                 try {
+                    total += 1;
                     sensor_json.put("fifo_max_event_count",
                             sensor.getFifoMaxEventCount());
                     sensor_json.put("fifo_reserved_event_count",
@@ -217,6 +222,22 @@ public class SensorService implements SensorEventListener  {
                     sensor_json.put("vendor", sensor.getVendor());
                     sensor_json.put("version", sensor.getVersion());
                     sensor_json.put("is_wakeup_sensor", sensor.isWakeUpSensor());
+
+
+                    String type =  sensor.getStringType();
+                    Pattern regex = Pattern.compile("\\.(\\S+)");
+                    String nameShow;
+                    Matcher match = regex.matcher(type);
+                    if (match.find()) {
+                        String s = match.group(1);
+                        nameShow = s.substring(7);
+                        nameShow = nameShow.substring(0, 1).toUpperCase() + nameShow.substring(1);
+                        nameShow = nameShow.replace("_"," ");
+                    }
+                    else{
+                        nameShow = "Misc";
+                    }
+                    sensor_json.put("show_name",nameShow);
 
                     // Properties encoded as floats may contain NaN's.
                     // JSON and the JSON encoder cannot handle them.

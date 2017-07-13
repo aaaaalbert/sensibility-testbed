@@ -33,4 +33,19 @@
     android:layout_marginTop="15dp"
     android:id="@+id/ip_layout_address" />
 
+    <FrameLayout
+        android:id="@android:id/tabcontent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <fragment
+            android:id="@+id/config_setting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            class="com.sensibility_testbed.ConfigFragment">
+        </fragment>
+
+    </FrameLayout>
+
 </LinearLayout>

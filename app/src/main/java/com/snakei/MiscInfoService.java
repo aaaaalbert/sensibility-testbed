@@ -44,6 +44,8 @@ import org.json.JSONObject;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by lukas.puehringer@nyu.edu
@@ -267,6 +269,10 @@ public class MiscInfoService {
                 network_info_json.put("is_failover",
                         network_info.isFailover());
                 network_info_json.put("is_roaming", network_info.isRoaming());
+
+                String type =  network_info.getTypeName();
+                type.replace("_"," ");
+                network_info_json.put("show_name",type);
 
                 network_info_json_array.put(network_info_json);
             }
